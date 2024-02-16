@@ -1,5 +1,12 @@
+### Used
+
+- Netsjs with typeorm
+- PostgreSQL
+- RabbitMQ
 
 ### How to run
+
+Open a Terminal 
 
 ```bash
 cd server_hibou
@@ -12,6 +19,7 @@ npm run start
 open new terminal 
 
 ```bash
+cd notification_hibou
 docker exec --interactive --tty notification_hibou bash
 npm run start
 ```
