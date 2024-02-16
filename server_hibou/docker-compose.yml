@@ -1,0 +1,139 @@
+services:
+  server_hibou: 
+    container_name: server_hibou
+    image: server_hibou:local
+    build: .
+    environment:
+      # BDD config
+      - POSTGRES_HOST=postgres_hibou
+      - POSTGRES_USER=admin_hibou
+      - POSTGRES_PASSWORD=admin_hibou
+      - POSTGRES_DB=hibou_bdd
+      - POSTGRES_PORT=5432
+
+      # RabbitMQ config
+      - RABBITMQ_HOST=rabbitmq_hibou
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USER=admin_hibou
+      - RABBITMQ_PASSWORD=admin_hibou
+      - RABBITMQ_QUEUE_NAME=notification_queue
+    ports:
+      - 8080:8080
+    depends_on:
+      - postgres_hibou
+    networks:
+      - hibou_network
+    command: /bin/sh
+    stdin_open: true
+    tty: true
+
+  notification_hibou:
+    container_name: notification_hibou
+    build: 
+      context: ./../notification_hibou
+      dockerfile: ./../notification_hibou/Dockerfile
+    environment:
+      # RabbitMQ config
+      - RABBITMQ_HOST=rabbitmq_hibou
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USER=admin_hibou
+      - RABBITMQ_PASSWORD=admin_hibou
+      - RABBITMQ_QUEUE_NAME=notification_queue
+    depends_on:
+      - rabbitmq_hibou
+    networks:
+      - hibou_network
+    ports:
+      - 8081:8081
+    command: /bin/sh
+    stdin_open: true
+    tty: true
+  
+  postgres_hibou:
+    container_name: postgres_hibou
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: admin_hibou
+      POSTGRES_PASSWORD: admin_hibou
+      POSTGRES_DB: hibou_bdd
+    ports:
+      - 5432:5432
+    networks:
+      - hibou_network
+
+  rabbitmq_hibou:
+    container_name: rabbitmq_hibou
+    image: rabbitmq:3-management
+    environment:
+      RABBITMQ_DEFAULT_USER: admin_hibou
+      RABBITMQ_DEFAULT_PASS: admin_hibou
+    ports:
+      - 5672:5672
+      - 15672:15672
+    networks:
+      - hibou_network
+    stdin_open: true
+    tty: true
+
+networks:
+  hibou_network:
+    driver: bridge
+
+
+
+# services:
+
+#   server_hibou:
+#     image: server_hibou:local
+#     container_name: server_hibou
+#     build: .
+#     ports:
+#       - 8080:8080
+#     environment:
+#       - POSTGRES_HOST=postgres_db
+#       - POSTGRES_USER=admin_hibou
+#       - POSTGRES_PASSWORD=admin_hibou
+#       - POSTGRES_DB=hibou_bdd
+#       - POSTGRES_PORT=5432
+#     depends_on:
+#       - postgres
+#     networks:
+#       - hibou_network
+
+#   notification_hibou:
+#     image: notification_hibou:local
+#     container_name: notification_hibou
+#     build: .
+#     environment:
+#       - RABBITMQ_HOST=rabbitmq
+#       - RABBITMQ_PORT=5672
+#       - RABBITMQ_USER=admin_hibou
+#       - RABBITMQ_PASSWORD=admin_hibou
+#       - RABBITMQ_QUEUE_NAME=notification_queue
+#     depends_on:
+#       - rabbitmq
+#     networks:
+#       - hibou_network
+  
+#   rabbitmq:
+#     image: rabbitmq:3-management
+#     container_name: rabbitmq
+#     ports:
+#       - 5672:5672
+#       - 15672:15672
+#     networks:
+#       - hibou_network
+
+#   postgres:
+#     image: postgres:13
+#     container_name: postgres_db
+#     ports:
+#       - '5432:5432'
+#     environment:
+#       POSTGRES_DB: hibou_bdd
+#       POSTGRES_USER: admin_hibou
+#       POSTGRES_PASSWORD: admin_hibou
+    
+# networks:
+#   hibou_network:
+#     driver: bridge
