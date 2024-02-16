@@ -7,18 +7,21 @@ docker-compose up -d --build
 
 docker exec --interactive --tty server_hibou bash
 npm run start
+````
 
 open new terminal 
 
+```bash
 docker exec --interactive --tty notification_hibou bash
 npm run start
 ```
 
 ### How to Test
 
-```bash
-open Postman 
+OPEN POSTMAN 
 
+
+```bash
 Create a category 
 
 ==> POST  http://localhost:8080/category
